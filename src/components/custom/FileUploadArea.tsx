@@ -1,7 +1,7 @@
 // src/components/custom/FileUploadArea.tsx
 "use client";
 
-import { useState, useCallback, type ChangeEvent, type DragEvent } from 'react';
+import { useState, useCallback, type ChangeEvent, type DragEvent, useRef } from 'react';
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,6 +36,7 @@ export function FileUploadArea() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(formSchema),
@@ -196,6 +197,7 @@ export function FileUploadArea() {
                       onDrop={onDrop}
                       onDragOver={onDragOver}
                       onDragLeave={onDragLeave}
+                      onClick={() => fileInputRef.current?.click()}
                       className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer 
                         bg-muted/50 hover:bg-muted/70 transition-colors
                         ${isDragging ? 'border-primary' : 'border-border'}
@@ -209,6 +211,7 @@ export function FileUploadArea() {
                         تصاویر یا ویدیوها (حداکثر ${MAX_FILE_SIZE_MB} مگابایت)
                       </p>
                       <Input
+                        ref={fileInputRef}
                         id="file-upload"
                         type="file"
                         className="hidden"
