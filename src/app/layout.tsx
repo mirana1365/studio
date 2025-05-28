@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'FileForge - Upload and Manage Files',
-  description: 'Easily upload, rename, and manage your photos and videos with AI-powered filename suggestions.',
+  title: 'فایل‌فورج - بارگذاری و مدیریت فایل‌ها',
+  description: 'به راحتی عکس‌ها و ویدیوهای خود را با پیشنهادات نام فایل مبتنی بر هوش مصنوعی بارگذاری، تغییر نام و مدیریت کنید.',
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <ThemeProvider defaultTheme="system" storageKey="fileforge-theme">
           <Navbar />

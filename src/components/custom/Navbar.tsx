@@ -19,7 +19,7 @@ export function Navbar() {
         <Link href="/" className="flex items-center space-x-2.5 mr-auto">
           <FileForgeIcon />
           <span className="font-bold text-xl sm:text-2xl tracking-tight">
-            FileForge
+            فایل‌فورج
           </span>
         </Link>
         <ThemeSwitcher />

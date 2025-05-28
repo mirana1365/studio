@@ -20,12 +20,12 @@ const MAX_FILE_SIZE_MB = 100;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const formSchema = z.object({
-  file: z.custom<File | null>((val) => val instanceof File, "Please select a file.")
-    .refine((file) => file && file.size <= MAX_FILE_SIZE_BYTES, `File size must be ${MAX_FILE_SIZE_MB}MB or less.`)
-    .refine((file) => file && (file.type.startsWith("image/") || file.type.startsWith("video/")), "Only image or video files are allowed."),
-  customFilename: z.string().min(1, "Filename is required.").max(200, "Filename is too long (max 200 chars).")
-    .regex(/^[a-zA-Z0-9._\s-]+$/, "Filename contains invalid characters."),
-  description: z.string().max(500, "Description is too long (max 500 chars).").optional(),
+  file: z.custom<File | null>((val) => val instanceof File, "لطفا یک فایل انتخاب کنید.")
+    .refine((file) => file && file.size <= MAX_FILE_SIZE_BYTES, `اندازه فایل باید ${MAX_FILE_SIZE_MB} مگابایت یا کمتر باشد.`)
+    .refine((file) => file && (file.type.startsWith("image/") || file.type.startsWith("video/")), "فقط فایل‌های تصویری یا ویدیویی مجاز هستند."),
+  customFilename: z.string().min(1, "نام فایل الزامی است.").max(200, "نام فایل خیلی طولانی است (حداکثر ۲۰۰ کاراکتر).")
+    .regex(/^[a-zA-Z0-9._\s-]+$/, "نام فایل شامل کاراکترهای نامعتبر است."),
+  description: z.string().max(500, "توضیحات خیلی طولانی است (حداکثر ۵۰۰ کاراکتر).").optional(),
 });
 
 type UploadFormValues = z.infer<typeof formSchema>;
@@ -85,7 +85,7 @@ export function FileUploadArea() {
 
   const onSubmit: SubmitHandler<UploadFormValues> = async (data) => {
     if (!data.file) {
-      toast({ variant: "destructive", title: "No file selected", description: "Please select a file to upload." });
+      toast({ variant: "destructive", title: "هیچ فایلی انتخاب نشده است", description: "لطفا یک فایل برای بارگذاری انتخاب کنید." });
       return;
     }
     setIsUploading(true);
@@ -101,7 +101,7 @@ export function FileUploadArea() {
       if (result.success) {
         toast({
           variant: "default",
-          title: "Upload Successful",
+          title: "بارگذاری موفقیت آمیز بود",
           description: result.message,
           action: <FileCheck2 className="text-green-500" />,
         });
@@ -110,7 +110,7 @@ export function FileUploadArea() {
       } else {
         toast({
           variant: "destructive",
-          title: "Upload Failed",
+          title: "بارگذاری ناموفق بود",
           description: result.message,
           action: <FileWarning className="text-red-500" />,
         });
@@ -118,8 +118,8 @@ export function FileUploadArea() {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Upload Error",
-        description: "An unexpected error occurred.",
+        title: "خطا در بارگذاری",
+        description: "یک خطای غیرمنتظره رخ داد.",
         action: <FileWarning className="text-red-500" />,
       });
     } finally {
@@ -132,12 +132,12 @@ export function FileUploadArea() {
     const description = form.getValues("description");
 
     if (!file) {
-      toast({ variant: "destructive", title: "Cannot Suggest", description: "Please select a file first." });
+      toast({ variant: "destructive", title: "امکان پیشنهاد وجود ندارد", description: "لطفا ابتدا یک فایل انتخاب کنید." });
       return;
     }
     if (!description?.trim()) {
-      toast({ variant: "destructive", title: "Cannot Suggest", description: "Please provide a description for the file." });
-      form.setError("description", { type: "manual", message: "Description is required for AI suggestion." });
+      toast({ variant: "destructive", title: "امکان پیشنهاد وجود ندارد", description: "لطفا توضیحی برای فایل ارائه دهید." });
+      form.setError("description", { type: "manual", message: "توضیحات برای پیشنهاد هوش مصنوعی الزامی است." });
       return;
     }
     
@@ -155,19 +155,19 @@ export function FileUploadArea() {
             suggestedName += originalExt;
           }
           form.setValue("customFilename", suggestedName);
-          toast({ title: "Suggestion Applied", description: "AI suggested a new filename." });
+          toast({ title: "پیشنهاد اعمال شد", description: "هوش مصنوعی نام فایل جدیدی پیشنهاد داد." });
         } else {
-          toast({ variant: "destructive", title: "Suggestion Failed", description: result.message });
+          toast({ variant: "destructive", title: "پیشنهاد ناموفق بود", description: result.message });
         }
         setIsSuggesting(false);
       };
       reader.onerror = () => {
-         toast({ variant: "destructive", title: "Error Reading File", description: "Could not read file for AI suggestion." });
+         toast({ variant: "destructive", title: "خطا در خواندن فایل", description: "فایل برای پیشنهاد هوش مصنوعی خوانده نشد." });
          setIsSuggesting(false);
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      toast({ variant: "destructive", title: "Suggestion Error", description: "An unexpected error occurred during suggestion." });
+      toast({ variant: "destructive", title: "خطا در پیشنهاد", description: "یک خطای غیرمنتظره در طول پیشنهاد رخ داد." });
       setIsSuggesting(false);
     }
   };
@@ -177,9 +177,9 @@ export function FileUploadArea() {
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl">
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Upload Your Photo or Video</CardTitle>
+        <CardTitle className="text-2xl text-center">عکس یا ویدیوی خود را بارگذاری کنید</CardTitle>
         <CardDescription className="text-center">
-          Drag and drop a file or click to select. Provide a custom name and an optional description.
+          یک فایل را بکشید و رها کنید یا برای انتخاب کلیک کنید. یک نام سفارشی و توضیحات اختیاری ارائه دهید.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -188,9 +188,9 @@ export function FileUploadArea() {
             <FormField
               control={form.control}
               name="file"
-              render={() => ( // Field is controlled by custom logic, RHF tracks value/errors
+              render={() => ( 
                 <FormItem>
-                  <FormLabel>File</FormLabel>
+                  <FormLabel>فایل</FormLabel>
                   <FormControl>
                     <div
                       onDrop={onDrop}
@@ -203,10 +203,10 @@ export function FileUploadArea() {
                     >
                       <UploadCloud className={`w-10 h-10 mb-3 ${fileError ? 'text-destructive' : 'text-muted-foreground'}`} />
                       <p className={`mb-2 text-sm ${fileError ? 'text-destructive' : 'text-muted-foreground'}`}>
-                        <span className="font-semibold">Click to upload</span> or drag and drop
+                        <span className="font-semibold">برای بارگذاری کلیک کنید</span> یا بکشید و رها کنید
                       </p>
                       <p className={`text-xs ${fileError ? 'text-destructive' : 'text-muted-foreground'}`}>
-                        Images or Videos (MAX. ${MAX_FILE_SIZE_MB}MB)
+                        تصاویر یا ویدیوها (حداکثر ${MAX_FILE_SIZE_MB} مگابایت)
                       </p>
                       <Input
                         id="file-upload"
@@ -230,9 +230,9 @@ export function FileUploadArea() {
               name="customFilename"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="customFilename">Custom Filename (without extension)</FormLabel>
+                  <FormLabel htmlFor="customFilename">نام فایل سفارشی (بدون پسوند)</FormLabel>
                   <FormControl>
-                    <Input id="customFilename" placeholder="e.g., My Awesome Vacation Photo" {...field} />
+                    <Input id="customFilename" placeholder="مثال: عکس تعطیلات عالی من" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -244,9 +244,9 @@ export function FileUploadArea() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="description">Description (for AI suggestion)</FormLabel>
+                  <FormLabel htmlFor="description">توضیحات (برای پیشنهاد هوش مصنوعی)</FormLabel>
                   <FormControl>
-                    <Textarea id="description" placeholder="e.g., A beautiful sunset over the mountains" {...field} />
+                    <Textarea id="description" placeholder="مثال: غروب زیبای خورشید بر فراز کوه‌ها" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -262,19 +262,19 @@ export function FileUploadArea() {
                 className="w-full sm:w-auto"
               >
                 {isSuggesting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Wand2 className="mr-2 h-4 w-4" />
+                  <Wand2 className="ml-2 h-4 w-4" />
                 )}
-                Suggest Filename
+                پیشنهاد نام فایل
               </Button>
               <Button type="submit" disabled={isUploading || isSuggesting || !selectedFile} className="w-full sm:flex-1 bg-accent hover:bg-accent/90">
                 {isUploading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <UploadCloud className="mr-2 h-4 w-4" />
+                  <UploadCloud className="ml-2 h-4 w-4" />
                 )}
-                Upload File
+                بارگذاری فایل
               </Button>
             </div>
           </form>

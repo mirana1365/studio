@@ -15,8 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { LogIn, Loader2 } from 'lucide-react';
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, "Username is required."),
-  password: z.string().min(1, "Password is required."),
+  username: z.string().min(1, "نام کاربری الزامی است."),
+  password: z.string().min(1, "رمز عبور الزامی است."),
 });
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
@@ -32,7 +32,7 @@ export function AdminLoginForm({ onLoginSuccess }: AdminLoginFormProps) {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      username: "admin", // Pre-fill admin username for convenience
+      username: "admin", 
       password: "",
     },
   });
@@ -46,13 +46,13 @@ export function AdminLoginForm({ onLoginSuccess }: AdminLoginFormProps) {
     try {
       const result = await login(formData);
       if (result.success) {
-        toast({ title: "Login Successful", description: "Welcome to the admin panel." });
+        toast({ title: "ورود موفقیت آمیز بود", description: "به پنل مدیریت خوش آمدید." });
         onLoginSuccess();
       } else {
-        toast({ variant: "destructive", title: "Login Failed", description: result.message });
+        toast({ variant: "destructive", title: "ورود ناموفق بود", description: result.message });
       }
     } catch (error) {
-      toast({ variant: "destructive", title: "Login Error", description: "An unexpected error occurred." });
+      toast({ variant: "destructive", title: "خطا در ورود", description: "یک خطای غیرمنتظره رخ داد." });
     } finally {
       setIsLoading(false);
     }
@@ -62,8 +62,8 @@ export function AdminLoginForm({ onLoginSuccess }: AdminLoginFormProps) {
     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
       <Card className="w-full max-w-sm shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <CardDescription>Enter your credentials to access the admin panel.</CardDescription>
+          <CardTitle className="text-2xl">ورود مدیر</CardTitle>
+          <CardDescription>برای دسترسی به پنل مدیریت، اطلاعات کاربری خود را وارد کنید.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -73,9 +73,9 @@ export function AdminLoginForm({ onLoginSuccess }: AdminLoginFormProps) {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="username">Username</FormLabel>
+                    <FormLabel htmlFor="username">نام کاربری</FormLabel>
                     <FormControl>
-                      <Input id="username" placeholder="admin" {...field} />
+                      <Input id="username" placeholder="ادمین" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,7 +86,7 @@ export function AdminLoginForm({ onLoginSuccess }: AdminLoginFormProps) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="password">Password</FormLabel>
+                    <FormLabel htmlFor="password">رمز عبور</FormLabel>
                     <FormControl>
                       <Input id="password" type="password" placeholder="••••••••" {...field} />
                     </FormControl>
@@ -100,14 +100,14 @@ export function AdminLoginForm({ onLoginSuccess }: AdminLoginFormProps) {
                 ) : (
                   <LogIn className="mr-2 h-4 w-4" />
                 )}
-                Login
+                ورود
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter>
             <p className="text-xs text-muted-foreground text-center w-full">
-                Access to this area is restricted.
+                دسترسی به این بخش محدود است.
             </p>
         </CardFooter>
       </Card>

@@ -37,19 +37,16 @@ export function FilePreview({ file }: FilePreviewProps) {
         setIsLoading(false);
       };
       reader.onerror = () => {
-        setError('Failed to read image file.');
+        setError('فایل تصویر خوانده نشد.');
         setIsLoading(false);
       };
       reader.readAsDataURL(file);
     } else if (file.type.startsWith('video/')) {
-      // For videos, we can use Object URL for preview
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       setIsLoading(false);
-      // It's important to revoke the object URL when the component unmounts or file changes
       return () => URL.revokeObjectURL(url);
     } else {
-      // For other file types, no direct preview
       setPreviewUrl(null);
       setIsLoading(false);
     }
@@ -64,7 +61,7 @@ export function FilePreview({ file }: FilePreviewProps) {
       <Card className="mt-4 w-full max-w-md mx-auto shadow-md">
         <CardContent className="p-6 flex flex-col items-center justify-center h-48">
           <LoadingSpinner />
-          <p className="mt-2 text-muted-foreground">Loading preview...</p>
+          <p className="mt-2 text-muted-foreground">در حال بارگذاری پیش‌نمایش...</p>
         </CardContent>
       </Card>
     );
@@ -86,7 +83,7 @@ export function FilePreview({ file }: FilePreviewProps) {
       <CardContent className="p-0">
         {fileType?.startsWith('image/') && previewUrl && (
           <div className="relative w-full aspect-video">
-            <Image src={previewUrl} alt="File preview" layout="fill" objectFit="contain" data-ai-hint="abstract photo" />
+            <Image src={previewUrl} alt="پیش‌نمایش فایل" layout="fill" objectFit="contain" data-ai-hint="abstract photo" />
           </div>
         )}
         {fileType?.startsWith('video/') && previewUrl && (
@@ -96,8 +93,8 @@ export function FilePreview({ file }: FilePreviewProps) {
           <div className="p-6 flex flex-col items-center justify-center h-48 bg-muted/50">
             {fileType?.startsWith('video/') ? <Film className="w-16 h-16 text-muted-foreground mb-2" /> : <FileIcon className="w-16 h-16 text-muted-foreground mb-2" />}
             <p className="text-sm text-muted-foreground font-medium">{file.name}</p>
-            <p className="text-xs text-muted-foreground">({(file.size / (1024*1024)).toFixed(2)} MB)</p>
-            <p className="text-xs text-muted-foreground mt-1">No preview available for this file type.</p>
+            <p className="text-xs text-muted-foreground">({(file.size / (1024*1024)).toFixed(2)} مگابایت)</p>
+            <p className="text-xs text-muted-foreground mt-1">پیش‌نمایش برای این نوع فایل موجود نیست.</p>
           </div>
         )}
       </CardContent>

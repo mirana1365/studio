@@ -6,11 +6,11 @@ import { verifyPassword } from "@/lib/auth";
 import { z } from "zod";
 
 const SESSION_COOKIE_NAME = "fileforge-admin-session";
-const ADMIN_USERNAME = "admin"; // Fixed username for simplicity
+const ADMIN_USERNAME = "admin"; 
 
 const loginSchema = z.object({
-  username: z.string().refine(val => val === ADMIN_USERNAME, {message: "Invalid username."}),
-  password: z.string().min(1, "Password is required."),
+  username: z.string().refine(val => val === ADMIN_USERNAME, {message: "نام کاربری نامعتبر است."}),
+  password: z.string().min(1, "رمز عبور الزامی است."),
 });
 
 export async function login(formData: FormData): Promise<{ success: boolean; message: string }> {
@@ -29,12 +29,12 @@ export async function login(formData: FormData): Promise<{ success: boolean; mes
     cookies().set(SESSION_COOKIE_NAME, "authenticated", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24, 
       path: "/",
     });
-    return { success: true, message: "Login successful." };
+    return { success: true, message: "ورود موفقیت آمیز بود." };
   } else {
-    return { success: false, message: "Invalid username or password." };
+    return { success: false, message: "نام کاربری یا رمز عبور نامعتبر است." };
   }
 }
 

@@ -11,16 +11,16 @@ const ALLOWED_FILE_TYPES = ["image/", "video/"]; // Prefixes for MIME types
 
 const fileSchema = z.instanceof(File).refine(
   (file) => file.size <= MAX_FILE_SIZE,
-  `File size should be less than ${MAX_FILE_SIZE / (1024*1024)}MB.`
+  `اندازه فایل باید کمتر از ${MAX_FILE_SIZE / (1024*1024)} مگابایت باشد.`
 ).refine(
   (file) => ALLOWED_FILE_TYPES.some(type => file.type.startsWith(type)),
-  "Only image and video files are allowed."
+  "فقط فایل‌های تصویری و ویدیویی مجاز هستند."
 );
 
 const uploadSchema = z.object({
   file: fileSchema,
-  customFilename: z.string().min(1, "Filename cannot be empty.").max(200, "Filename too long."),
-  description: z.string().optional(), // Description is optional for upload, required for AI suggestion
+  customFilename: z.string().min(1, "نام فایل نمی‌تواند خالی باشد.").max(200, "نام فایل خیلی طولانی است."),
+  description: z.string().optional(), 
 });
 
 export async function uploadFile(formData: FormData): Promise<{ success: boolean; message: string; filePath?: string }> {
@@ -40,18 +40,16 @@ export async function uploadFile(formData: FormData): Promise<{ success: boolean
 
   const { file: validatedFile, customFilename: validatedFilename } = parsed.data;
   
-  // Ensure filename has an extension
   let finalFilename = validatedFilename;
   const originalExt = validatedFile.name.includes('.') ? validatedFile.name.substring(validatedFile.name.lastIndexOf('.')) : '';
   if (!finalFilename.includes('.') && originalExt) {
     finalFilename += originalExt;
   } else if (!finalFilename.includes('.')) {
-    // Fallback if original has no extension, try to guess from MIME or default
     const mimeParts = validatedFile.type.split('/');
     if (mimeParts.length === 2 && mimeParts[1] !== '*') {
         finalFilename += `.${mimeParts[1]}`;
     } else {
-        finalFilename += '.dat'; // Default extension
+        finalFilename += '.dat'; 
     }
   }
 
@@ -59,12 +57,12 @@ export async function uploadFile(formData: FormData): Promise<{ success: boolean
   const { filePath, error } = await saveFileUtil(validatedFile, finalFilename);
 
   if (error) {
-    return { success: false, message: error };
+    return { success: false, message: error === 'Invalid filename after sanitization.' ? 'نام فایل پس از پاکسازی نامعتبر است.' : error || "ذخیره فایل ناموفق بود." };
   }
 
-  revalidatePath("/"); // Revalidate main page if needed
-  revalidatePath("/taupload"); // Revalidate admin page
-  return { success: true, message: "File uploaded successfully!", filePath };
+  revalidatePath("/"); 
+  revalidatePath("/taupload"); 
+  return { success: true, message: "فایل با موفقیت بارگذاری شد!", filePath };
 }
 
 export async function getFiles(): Promise<UploadedFile[]> {
@@ -73,7 +71,7 @@ export async function getFiles(): Promise<UploadedFile[]> {
 
 const renameSchema = z.object({
   oldName: z.string().min(1),
-  newName: z.string().min(1, "New filename cannot be empty.").max(200, "New filename too long."),
+  newName: z.string().min(1, "نام فایل جدید نمی‌تواند خالی باشد.").max(200, "نام فایل جدید خیلی طولانی است."),
 });
 export async function renameUploadedFile(oldName: string, newName: string): Promise<{ success: boolean; message: string }> {
   const parsed = renameSchema.safeParse({ oldName, newName });
@@ -81,13 +79,11 @@ export async function renameUploadedFile(oldName: string, newName: string): Prom
     return { success: false, message: parsed.error.errors.map(e => e.message).join(", ") };
   }
   
-  // Ensure newName has an extension if oldName had one
   let finalNewName = parsed.data.newName;
   const oldExt = parsed.data.oldName.includes('.') ? parsed.data.oldName.substring(parsed.data.oldName.lastIndexOf('.')) : '';
   if (oldExt && !finalNewName.toLowerCase().endsWith(oldExt.toLowerCase())) {
-     if (finalNewName.includes('.')) { // if user provided a different extension
-        // keep it
-     } else { // if user provided no extension
+     if (finalNewName.includes('.')) { 
+     } else { 
         finalNewName += oldExt;
      }
   }
@@ -96,24 +92,24 @@ export async function renameUploadedFile(oldName: string, newName: string): Prom
   const { success, error } = await renameFileUtil(parsed.data.oldName, finalNewName);
   if (success) {
     revalidatePath("/taupload");
-    return { success: true, message: "File renamed successfully." };
+    return { success: true, message: "نام فایل با موفقیت تغییر کرد." };
   }
-  return { success: false, message: error || "Failed to rename file." };
+  return { success: false, message: error === 'Invalid new filename after sanitization.' ? 'نام فایل جدید پس از پاکسازی نامعتبر است.' : error || "تغییر نام فایل ناموفق بود." };
 }
 
 export async function deleteUploadedFile(fileName: string): Promise<{ success: boolean; message: string }> {
-  if (!fileName) return { success: false, message: "Filename cannot be empty." };
+  if (!fileName) return { success: false, message: "نام فایل نمی‌تواند خالی باشد." };
   const { success, error } = await deleteFileUtil(fileName);
   if (success) {
     revalidatePath("/taupload");
-    return { success: true, message: "File deleted successfully." };
+    return { success: true, message: "فایل با موفقیت حذف شد." };
   }
-  return { success: false, message: error || "Failed to delete file." };
+  return { success: false, message: error || "حذف فایل ناموفق بود." };
 }
 
 const suggestSchema = z.object({
   fileDataUri: z.string().startsWith("data:"),
-  description: z.string().min(1, "Description cannot be empty.").max(500, "Description too long."),
+  description: z.string().min(1, "توضیحات نمی‌تواند خالی باشد.").max(500, "توضیحات خیلی طولانی است."),
 });
 export async function suggestNameAction(fileDataUri: string, description: string): Promise<{ success: boolean; suggestion?: string; message?: string }> {
   const parsed = suggestSchema.safeParse({ fileDataUri, description });
@@ -130,9 +126,9 @@ export async function suggestNameAction(fileDataUri: string, description: string
     if (result.suggestedFilename) {
       return { success: true, suggestion: result.suggestedFilename };
     }
-    return { success: false, message: "AI could not suggest a filename." };
+    return { success: false, message: "هوش مصنوعی نتوانست نام فایلی پیشنهاد دهد." };
   } catch (error: any) {
     console.error("AI suggestion error:", error);
-    return { success: false, message: error.message || "Failed to get AI suggestion." };
+    return { success: false, message: error.message || "دریافت پیشنهاد از هوش مصنوعی ناموفق بود." };
   }
 }
