@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // If serving local images via next/image from a non-standard path,
+    // you might need to configure domains or pathnames here.
+    // However, files in `public` are served statically and should work by default.
+    // domains: ['localhost'], // Example for local development if needed.
   },
 };
 
